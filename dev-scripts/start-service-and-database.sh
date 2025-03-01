@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# TODO: Reimplement automatically building the Spring Boot application. Coordinate changes with the docker-compose.yml file.
-# Clean and build the Spring Boot application
-# ./mvnw clean install
+# Clean and build the Spring Boot application, but skip Flyway migrations since the database is not yet running
+./mvnw clean install -Pskip-flyway
 
 # Start Docker containers
 sudo docker compose up --build -d

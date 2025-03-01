@@ -90,4 +90,13 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>skip-flyway</id>
+			<properties>
+				<spring.flyway.enabled>false</spring.flyway.enabled>
+			</properties>
+		</profile>
+	</profiles>
+
 </project>
