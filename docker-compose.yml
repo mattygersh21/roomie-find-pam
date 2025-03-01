@@ -11,29 +11,28 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    # networks:
-    #   - pam_network
+    networks:
+      - pam_network
 
-# TODO: Reimplement the spring-app service. Coordinate changes with start-service-and-database.sh file.
-  # spring-app:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   container_name: pam_spring_app
-  #   restart: always
-  #   ports:
-  #     - "8081:8081"
-  #   environment:
-  #     SPRING_DATASOURCE_URL: jdbc:postgresql://pam_postgres:5432/pam_database
-  #     SPRING_DATASOURCE_USERNAME: spring
-  #     SPRING_DATASOURCE_PASSWORD: spring
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - pam_network
+  spring-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pam_spring_app
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pam_postgres:5432/pam_database
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - postgres
+    networks:
+      - pam_network
 
 volumes:
   postgres_data:
 
-# networks:
-#   pam_network:
+networks:
+  pam_network:
