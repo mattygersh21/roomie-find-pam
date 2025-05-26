@@ -2,6 +2,7 @@ package emsquare.roomie_find.pam.services;
 
 import emsquare.roomie_find.pam.dtos.UserDto;
 import emsquare.roomie_find.pam.entities.User;
+import emsquare.roomie_find.pam.exceptions.EmailUsedException;
 import emsquare.roomie_find.pam.mappers.UserMapper;
 import emsquare.roomie_find.pam.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -56,5 +59,30 @@ public class UserServiceImplTest {
         assertEquals(BIRTH_DATE, result.getBirthDate());
 
         verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    @Test
+    public void testFindUserByEmail() {
+        Optional<User> user = Optional.of(UserMapper.toEntity(userDto));
+        when(userRepository.findByEmail(any(String.class))).thenReturn(user);
+        Optional<User> savedUser = userService.findUserByEmail(EMAIL);
+
+        assertEquals(savedUser, user);
+
+        verify(userRepository, times(1)).findByEmail(any(String.class));
+    }
+
+    @Test
+    public void testRegisterUserThrowsEmailUsedException() {
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(UserMapper.toEntity(userDto)));
+
+        EmailUsedException exception = assertThrows(EmailUsedException.class, () -> {
+            userService.registerUser(userDto);
+        });
+
+        assertEquals("Email address " + EMAIL + " is already in use.", exception.getMessage());
+
+        verify(userRepository, times(1)).findByEmail(EMAIL);
+        verify(userRepository, never()).save(any(User.class));
     }
 }
