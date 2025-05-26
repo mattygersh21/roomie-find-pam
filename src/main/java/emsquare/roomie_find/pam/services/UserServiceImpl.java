@@ -2,6 +2,7 @@ package emsquare.roomie_find.pam.services;
 
 import emsquare.roomie_find.pam.dtos.UserDto;
 import emsquare.roomie_find.pam.entities.User;
+import emsquare.roomie_find.pam.exceptions.EmailUsedException;
 import emsquare.roomie_find.pam.mappers.UserMapper;
 import emsquare.roomie_find.pam.repositories.UserRepository;
 import org.springframework.context.annotation.Primary;
@@ -18,7 +19,13 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+    @Override
     public UserDto registerUser(UserDto userDto) {
+        String newEmail = userDto.getEmail();
+        if (findUserByEmail(newEmail).isPresent()) {
+            throw new EmailUsedException("Email address " + newEmail + " is already in use.");
+        }
+
         User user = UserMapper.toEntity(userDto);
         userRepository.save(user);
 
