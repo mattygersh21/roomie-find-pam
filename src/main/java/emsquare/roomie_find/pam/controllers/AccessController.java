@@ -37,9 +37,10 @@ public class AccessController {
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest loginRequest) {
         // TODO: Replace this with legitimate authentication logic.
-        if ("admin".equals(loginRequest.getUsername()) && "password".equals(loginRequest.getPassword())) {
+
+        if ("admin".equals(loginRequest.getEmail()) && "password".equals(loginRequest.getPassword())) {
             String token = Jwts.builder()
-                .claim("sub", loginRequest.getUsername())
+                .claim("sub", loginRequest.getEmail())
                 .claim("iat", new Date())
                 .claim("exp", new Date(System.currentTimeMillis() + 3600000))
                 .signWith(SECRET_KEY)

@@ -36,7 +36,7 @@ public class AccessControllerTest {
     @Test
     public void testLoginSuccess() throws Exception {
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("admin");
+        loginRequest.setEmail("admin");
         loginRequest.setPassword("password");
 
         mockMvc.perform(post("/pam/login")
@@ -49,7 +49,7 @@ public class AccessControllerTest {
     @Test
     public void testLoginFailure() throws Exception {
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("admin");
+        loginRequest.setEmail("admin");
         loginRequest.setPassword("wrongpassword");
 
         assertThrows(ServletException.class, () -> {
