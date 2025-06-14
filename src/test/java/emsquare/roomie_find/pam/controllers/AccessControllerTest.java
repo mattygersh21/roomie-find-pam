@@ -3,8 +3,6 @@ package emsquare.roomie_find.pam.controllers;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,9 +15,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import emsquare.roomie_find.pam.dtos.LoginRequest;
+import emsquare.roomie_find.pam.dtos.LoginResponse;
 import emsquare.roomie_find.pam.dtos.UserDto;
+import emsquare.roomie_find.pam.exceptions.PasswordIncorrectException;
 import emsquare.roomie_find.pam.services.UserService;
-import jakarta.servlet.ServletException;
 
 @WebMvcTest(AccessController.class)
 public class AccessControllerTest {
@@ -36,28 +35,33 @@ public class AccessControllerTest {
     @Test
     public void testLoginSuccess() throws Exception {
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("admin");
+        loginRequest.setEmail("admin@example.com");
         loginRequest.setPassword("password");
+
+        LoginResponse loginResponse = new LoginResponse("mocked-jwt-token");
+
+        Mockito.when(userService.attemptLogin(Mockito.any(LoginRequest.class))).thenReturn(loginResponse);
 
         mockMvc.perform(post("/pam/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token", notNullValue()));
+                .andExpect(jsonPath("$.token").value("mocked-jwt-token"));
     }
 
     @Test
-    public void testLoginFailure() throws Exception {
+    public void testLoginFailurePasswordIncorrect() throws Exception {
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("admin");
+        loginRequest.setEmail("admin@example.com");
         loginRequest.setPassword("wrongpassword");
 
-        assertThrows(ServletException.class, () -> {
-            mockMvc.perform(post("/pam/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(loginRequest)))
-                    .andExpect(status().isOk());
-        });
+        Mockito.when(userService.attemptLogin(Mockito.any(LoginRequest.class)))
+                .thenThrow(new PasswordIncorrectException("Password is incorrect for user: admin@example.com"));
+
+        mockMvc.perform(post("/pam/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
