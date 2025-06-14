@@ -1,9 +1,5 @@
 package emsquare.roomie_find.pam.controllers;
 
-import java.security.Key;
-import java.util.Base64;
-import java.util.Date;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,41 +11,28 @@ import emsquare.roomie_find.pam.dtos.LoginRequest;
 import emsquare.roomie_find.pam.dtos.LoginResponse;
 import emsquare.roomie_find.pam.dtos.UserDto;
 import emsquare.roomie_find.pam.services.UserService;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 
 @RestController
 @RequestMapping("/pam")
 @CrossOrigin(origins = "*")
 public class AccessController {
     
-    // TODO: Move non-controller logic to business layer.
-    
-    // TODO: Replace with secret key.
-    private static final String SECRET_KEY_STRING = "someBase64StringThatMeetsTheStandardOfBeingAtLeast";
-    private static final Key SECRET_KEY = Keys.hmacShaKeyFor(Base64.getDecoder().decode(SECRET_KEY_STRING));
     private final UserService userService;
 
     public AccessController(UserService userService) {
         this.userService = userService;
     }
 
-    @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
-        // TODO: Replace this with legitimate authentication logic.
+    // @PostMapping("/login")
+    // public LoginResponse login(@RequestBody LoginRequest loginRequest) {
+    //     return userService.attemptLogin(loginRequest);
+    // }
 
-        if ("admin".equals(loginRequest.getEmail()) && "password".equals(loginRequest.getPassword())) {
-            String token = Jwts.builder()
-                .claim("sub", loginRequest.getEmail())
-                .claim("iat", new Date())
-                .claim("exp", new Date(System.currentTimeMillis() + 3600000))
-                .signWith(SECRET_KEY)
-                .compact();
-            return new LoginResponse(token);
-        } else {
-            throw new RuntimeException("Invalid credentials");
-        }
-    }
+    @PostMapping("/login")
+public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    LoginResponse response = userService.attemptLogin(loginRequest);
+    return ResponseEntity.ok(response);
+}
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {

@@ -15,5 +15,16 @@ public class GlobalExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.CONFLICT, ex.getMessage());
         return new ResponseEntity<ApiError>(apiError, HttpStatus.CONFLICT);
     }
-    
+
+    @ExceptionHandler(PasswordIncorrectException.class)
+    public ResponseEntity<ApiError> handlePasswordIncorrectException(PasswordIncorrectException ex) {
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return new ResponseEntity<ApiError>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<ApiError> handleEmailNotFoundException(EmailNotFoundException ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage());
+        return new ResponseEntity<ApiError>(apiError, HttpStatus.NOT_FOUND);
+    }
 }
